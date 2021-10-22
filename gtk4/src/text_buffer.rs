@@ -1,6 +1,7 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::{TextBuffer, TextIter};
+use crate::prelude::*;
+use crate::{TextBuffer, TextIter, TextTag};
 use glib::object::{Cast, IsA};
 use glib::signal::{connect_raw, SignalHandlerId};
 use glib::translate::*;
@@ -10,6 +11,15 @@ use std::mem::transmute;
 use std::{slice, str};
 
 pub trait TextBufferExtManual: 'static {
+    #[doc(alias = "gtk_text_buffer_create_tag")]
+    fn create_tag(&self, tag_name: Option<&str>) -> Option<TextTag>;
+
+    #[doc(alias = "gtk_text_buffer_insert_with_tags")]
+    fn insert_with_tags(&self, iter: &mut TextIter, text: &str, tags: &[TextTag]);
+
+    #[doc(alias = "gtk_text_buffer_insert_with_tags_by_name")]
+    fn insert_with_tags_by_name(&self, iter: &mut TextIter, text: &str, tags_names: &[&str]);
+
     fn connect_insert_text<F: Fn(&Self, &mut TextIter, &str) + 'static>(
         &self,
         f: F,
@@ -17,11 +27,61 @@ pub trait TextBufferExtManual: 'static {
 }
 
 impl<O: IsA<TextBuffer>> TextBufferExtManual for O {
+    fn create_tag(&self, tag_name: Option<&str>) -> Option<TextTag> {
+        let tag = TextTag::new(tag_name);
+        if self.as_ref().tag_table().add(&tag) {
+            Some(tag)
+        } else {
+            None
+        }
+    }
+
+    fn insert_with_tags(&self, iter: &mut TextIter, text: &str, tags: &[TextTag]) {
+        let start_offset = iter.offset();
+        self.as_ref().insert(iter, text);
+        let start_iter = self.as_ref().iter_at_offset(start_offset);
+        tags.iter().for_each(|tag| {
+            self.as_ref().apply_tag(tag, &start_iter, iter);
+        });
+    }
+
+    fn insert_with_tags_by_name(&self, iter: &mut TextIter, text: &str, tags_names: &[&str]) {
+        let start_offset = iter.offset();
+        self.as_ref().insert(iter, text);
+        let start_iter = self.as_ref().iter_at_offset(start_offset);
+        let tag_table = self.as_ref().tag_table();
+        tags_names.iter().for_each(|tag_name| {
+            if let Some(tag) = tag_table.lookup(tag_name) {
+                self.as_ref().apply_tag(&tag, &start_iter, iter);
+            }
+        });
+    }
+
     fn connect_insert_text<F: Fn(&Self, &mut TextIter, &str) + 'static>(
         &self,
         f: F,
     ) -> SignalHandlerId {
         unsafe {
+            unsafe extern "C" fn insert_text_trampoline<
+                T,
+                F: Fn(&T, &mut TextIter, &str) + 'static,
+            >(
+                this: *mut ffi::GtkTextBuffer,
+                location: *mut ffi::GtkTextIter,
+                text: *mut c_char,
+                len: c_int,
+                f: glib::ffi::gpointer,
+            ) where
+                T: IsA<TextBuffer>,
+            {
+                let mut location_copy = from_glib_none(location);
+                let f: &F = &*(f as *const F);
+                f(
+                    TextBuffer::from_glib_borrow(this).unsafe_cast_ref(),
+                    &mut location_copy,
+                    str::from_utf8(slice::from_raw_parts(text as *const u8, len as usize)).unwrap(),
+                )
+            }
             let f: Box_<F> = Box_::new(f);
             connect_raw(
                 self.to_glib_none().0 as *mut _,
@@ -31,22 +91,4 @@ impl<O: IsA<TextBuffer>> TextBufferExtManual for O {
             )
         }
     }
-}
-
-unsafe extern "C" fn insert_text_trampoline<T, F: Fn(&T, &mut TextIter, &str) + 'static>(
-    this: *mut ffi::GtkTextBuffer,
-    location: *mut ffi::GtkTextIter,
-    text: *mut c_char,
-    len: c_int,
-    f: glib::ffi::gpointer,
-) where
-    T: IsA<TextBuffer>,
-{
-    let mut location_copy = from_glib_none(location);
-    let f: &F = &*(f as *const F);
-    f(
-        TextBuffer::from_glib_borrow(this).unsafe_cast_ref(),
-        &mut location_copy,
-        str::from_utf8(slice::from_raw_parts(text as *const u8, len as usize)).unwrap(),
-    )
 }
