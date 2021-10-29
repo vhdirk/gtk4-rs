@@ -1,4 +1,4 @@
-# Prerequisites
+# Project Setup
 
 There are a few recommended ways to set up your workstation in order to develop `gtk-rs` applications.
 Let us go through them one by one.
@@ -17,9 +17,9 @@ Now create a new project by executing:
 cargo new my-gtk-app
 ```
 
-Add the following lines to your dependencies in `Cargo.toml`.
+Add the following lines to your dependencies in `Cargo.toml`, where `X.X` should be replaced with the most up-to-date version of the [crate](https://crates.io/crates/gtk4).
 ```toml
-gtk = { version = "0.2", package = "gtk4" }
+gtk = { version = "X.X", package = "gtk4" }
 ```
 
 Now you can run your application by executing:

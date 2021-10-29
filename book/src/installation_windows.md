@@ -1,4 +1,4 @@
-# Installing GTK4 on Windows
+# Windows
 
 Installing GTK4 for gtk4-rs on Windows just takes a few minutes.
 Follow the **preparation** first and then proceed with installing GTK either for the **GNU toolchain**
