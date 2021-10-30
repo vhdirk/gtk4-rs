@@ -14,30 +14,6 @@ Make sure to check the box "Desktop development with C++" during the installatio
 
 <div style="text-align:center"><img src="img/vs-install.png" /></div>
 
-### Set PKG_CONFIG_PATH environment variable
-
-1. Go to settings -> Search and open `Advanced system settings` -> click on `Environment variables`
-2. Under `User variables` click on `New` and add:
-
-- Variable name: `PKG_CONFIG_PATH`
-- Variable value: `C:\gnome\lib\pkgconfig;C:\gstreamer\1.0\msvc_x86_64\lib\pkgconfig`
-
-
-
-### GStreamer
-
-1. Install gstreamer from [gstreamer.freedesktop.org](https://gstreamer.freedesktop.org/download/) using both runtime and development installers.
-You might need to select right-click -> Properties -> Security: "Unblock" after download.
-
-2. Go to settings -> Search and open `Advanced system settings` -> click on `Environment variables`
-3. Select `Path` -> Click on `Edit` -> Add the following three entries:
-
-```
-C:\gstreamer\1.0\msvc_x86_64\include
-C:\gstreamer\1.0\msvc_x86_64\bin
-C:\gstreamer\1.0\msvc_x86_64\lib
-```
-
 
 ### Dependencies to install via the command line
 
@@ -52,22 +28,10 @@ ninja --version
 meson --version
 ```
 
-If one of them is missing install the package manager `scoop` by executing the following in the powershell terminal:
+If `meson` was missing as well, install it with
 
 ```powershell
-iwr -useb get.scoop.sh | iex
-```
-
-Then install the missing dependencies with
-
-```powershell
-scoop install git python pkg-config ninja
-```
-
-If `meson` was missing as well, install it next with
-
-```powershell
-pip install meson
+pip install meson ninja
 ```
 
 ### Compile and install GTK4
@@ -78,11 +42,26 @@ From there run the following commands:
 
 ```powershell
 cd /
-git clone https://gitlab.gnome.org/GNOME/gtk.git --depth 1
+git clone https://gitlab.gnome.org/GNOME/gtk.git --branch 4.4.0
 cd gtk
-meson setup builddir -Dbuild-tests=false --prefix C:/gnome
+meson setup builddir -Dbuild-tests=false --prefix=C:/gnome -Dmedia-gstreamer=disabled
 meson install -C builddir
 ```
+
+### Set PKG_CONFIG_PATH and update Path environment variable
+
+1. Go to settings -> Search and open `Advanced system settings` -> click on `Environment variables`
+2. Under `User variables` click on `New` and add:
+
+- Variable name: `PKG_CONFIG_PATH`
+- Variable value: `C:\gnome\lib\pkgconfig`
+
+3. Select `Path` -> Click on `Edit` -> Add :
+ 
+```
+C:\gnome\bin
+```
+
 
 ## GNU toolchain
 
@@ -123,11 +102,3 @@ To switch to `stable-gnu`, run the following commands from your terminal:
 
 Please note that this command might change in the future.
 If it does not work anymore please open an issue [here](https://github.com/gtk-rs/gtk4-rs/issues/new/choose).
-
-### Install GTK
-
-Run the following command from your **MSYS2 terminal**:
-
-
-
-
