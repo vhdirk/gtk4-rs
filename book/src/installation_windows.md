@@ -42,9 +42,9 @@ From there run the following commands:
 
 ```powershell
 cd /
-git clone https://gitlab.gnome.org/GNOME/gtk.git --branch 4.4.0
+git clone https://gitlab.gnome.org/GNOME/gtk.git --depth 1
 cd gtk
-meson setup builddir -Dbuild-tests=false --prefix=C:/gnome -Dmedia-gstreamer=disabled
+meson setup builddir --prefix=C:/gnome -Dbuild-tests=false -Dmedia-gstreamer=disabled
 meson install -C builddir
 ```
 
