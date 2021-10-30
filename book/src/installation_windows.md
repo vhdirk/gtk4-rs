@@ -1,11 +1,25 @@
 # Windows
 
-When preparing your windows machine you have to decide between using the **MSVC toolchain** or  the **GNU toolchain**.
-
-In both cases you will have to install the rust toolchain via [rustup](https://rustup.rs/).
+When preparing your Windows machine you have to decide between using the **MSVC toolchain** or the **GNU toolchain**.
+If in doubt go for MSVC since that is the default on Windows.
+You will want to go for the GNU toolchain if you depend on libraries that can only be compiled with the GNU toolchain.
 
 
 ## MSVC toolchain
+
+### Install Rustup
+
+Install the rust toolchain via [rustup](https://rustup.rs/).
+
+### Remove residues from the GNU toolchain (if applicable)
+
+If you used the GNU toolchain before, make sure to revert all changes you made to environment variables during the installation process.
+
+Also set the rust toolchain back to msvc by executing:
+
+```
+rustup default stable-msvc
+```
 
 ### Visual Studio
 
@@ -14,24 +28,40 @@ Make sure to check the box "Desktop development with C++" during the installatio
 
 <div style="text-align:center"><img src="img/vs-install.png" /></div>
 
+### Git
 
-### Dependencies to install via the command line
+Download git from https://gitforwindows.org/.
 
-Then, make sure that you have `git`, `python`, `pkg-config`, `ninja` and `meson` in your `PATH`.
-One way to do that is by requesting the version of the program in your terminal and check if it outputs an error:
 
-```powershell
-git --version
-python --version
-pkg-config --version
-ninja --version
-meson --version
-```
+### Python
 
-If `meson` was missing as well, install it with
+Download python from https://www.python.org/downloads.
+Make sure to opt-in to adding Python to your Path during the installation process.
+
+
+### Meson
+
+Install meson by executing:
 
 ```powershell
 pip install meson ninja
+```
+
+
+### Pkg-config
+
+Download pkg-config from https://sourceforge.net/projects/pkgconfiglite/.
+Then extract and unpack it in `C:/` so that the executable is then in `C:\pkg-config-lite-0.28-1\bin`.
+
+
+### Update Path environment variable
+
+1. Go to settings -> Search and open `Advanced system settings` -> click on `Environment variables`
+2. Select `Path` -> Click on `Edit` -> Add the following entries:
+ 
+```
+C:\pkg-config-lite-0.28-1\bin
+C:\gnome\bin
 ```
 
 ### Compile and install GTK4
@@ -48,7 +78,7 @@ meson setup builddir --prefix=C:/gnome -Dbuild-tests=false -Dmedia-gstreamer=dis
 meson install -C builddir
 ```
 
-### Set PKG_CONFIG_PATH and update Path environment variable
+### Set PKG_CONFIG_PATH  environment variable
 
 1. Go to settings -> Search and open `Advanced system settings` -> click on `Environment variables`
 2. Under `User variables` click on `New` and add:
@@ -56,20 +86,19 @@ meson install -C builddir
 - Variable name: `PKG_CONFIG_PATH`
 - Variable value: `C:\gnome\lib\pkgconfig`
 
-3. Select `Path` -> Click on `Edit` -> Add :
- 
-```
-C:\gnome\bin
-```
-
 
 ## GNU toolchain
 
+### Install Rustup
 
-### Dependencies
+Install the rust toolchain via [rustup](https://rustup.rs/).
 
-1. Install the rust toolchain via [rustup](https://rustup.rs/)
-2. Install MSYS2 from [www.msys2.org](https://www.msys2.org/) 
+
+### MSYS2
+
+Install MSYS2 from [www.msys2.org](https://www.msys2.org/) 
+
+### Install GTK 4
 
 From the Windows start menu, search for `MSYS2 MinGW 64-bit`.
 That will open a terminal configured to use MinGW x64 tools.
@@ -92,7 +121,7 @@ C:\msys64\mingw64\bin
 C:\msys64\mingw64\lib
 ```
 
-### Setup the `windows-gnu` toolchain for Rust
+### Setup the GNU toolchain for Rust
 
 The default toolchain on windows is `stable-msvc`.
 To switch to `stable-gnu`, run the following commands from your terminal:
