@@ -33,7 +33,7 @@ cargo run
 
 Cargo is *almost* enough, but it is not well suited for handling resources such as icons or UI definition files.
 That is why we recommend to use [Meson](https://mesonbuild.com/) on top of it.
-It is cross-platform and its syntax is very readable.
+It is cross-platform, and its syntax is very readable.
 Meson takes care of
 - translations,
 - building and installing [resources](resources.html) as well as
