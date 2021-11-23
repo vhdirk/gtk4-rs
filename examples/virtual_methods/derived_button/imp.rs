@@ -1,14 +1,22 @@
 use crate::base_button::*;
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
-
+use once_cell::unsync::OnceCell;
 #[derive(Debug, Default)]
-pub struct DerivedButton {}
+pub struct DerivedButton {
+    pub msg: OnceCell<String>
+}
 
 #[glib::object_subclass]
 impl ObjectSubclass for DerivedButton {
     const NAME: &'static str = "ExampleDerivedButton";
     type ParentType = BaseButton;
     type Type = super::DerivedButton;
+
+    fn new() -> Self {
+        Self {
+            msg: OnceCell::new(),
+        }
+    }
 }
 
 impl ObjectImpl for DerivedButton {}
@@ -18,11 +26,7 @@ impl ButtonImpl for DerivedButton {}
 /// Implement the base trait and override the functions
 impl BaseButtonImpl for DerivedButton {
     fn sync_method(&self, obj: &BaseButton, extra_text: Option<String>) {
-        if let Some(text) = extra_text {
-            obj.set_label(&format!("DerivedButton sync {}", text));
-        } else {
-            obj.set_label("DerivedButton sync");
-        }
+        obj.set_label(self.msg.get().unwrap());
     }
 
     fn async_method(&self, obj: &BaseButton) -> PinnedFuture {

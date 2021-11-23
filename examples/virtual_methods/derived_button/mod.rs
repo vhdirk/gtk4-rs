@@ -1,6 +1,8 @@
 mod imp;
 
-use gtk::glib;
+use gtk::{
+    self, glib, glib::prelude::*, glib::subclass::prelude::*, prelude::*, subclass::prelude::*,
+};
 
 glib::wrapper! {
     pub struct DerivedButton(ObjectSubclass<imp::DerivedButton>)
@@ -15,6 +17,10 @@ impl DerivedButton {
 
 impl Default for DerivedButton {
     fn default() -> Self {
-        Self::new()
+        let d = Self::new();
+        let imp = imp::DerivedButton::from_instance(&d);
+
+        imp.msg.set("DerivedButton Oncecell text".to_string());
+        d
     }
 }
