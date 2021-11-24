@@ -86,7 +86,7 @@ impl ObjectSubclass for BaseButton {
 impl ObjectImpl for BaseButton {
     fn constructed(&self, obj: &Self::Type) {
         // For demo purposes, call the sync_method during construction to set the button label
-        obj.sync_method(Some(String::from("Sync extra text")));
+        // obj.sync_method(Some(String::from("Sync extra text")));
     }
 }
 

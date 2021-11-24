@@ -17,10 +17,6 @@ impl DerivedButton {
 
 impl Default for DerivedButton {
     fn default() -> Self {
-        let d = Self::new();
-        let imp = imp::DerivedButton::from_instance(&d);
-
-        imp.msg.set("DerivedButton Oncecell text".to_string());
-        d
+        Self::new()
     }
 }

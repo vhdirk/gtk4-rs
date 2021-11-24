@@ -19,6 +19,10 @@ fn main() {
         let base_button = base_button::BaseButton::new();
         let derived_button = derived_button::DerivedButton::default();
 
+
+        base_button.sync_method(None);
+        derived_button.sync_method(None);
+
         base_button.connect_clicked(|b| {
             let ctx = glib::MainContext::default();
             ctx.spawn_local(clone!(@weak b => async move {
